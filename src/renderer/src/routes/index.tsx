@@ -4,6 +4,7 @@ import { markInitialContentPartReady } from '@renderer/utils/startup'
 import {
   Connections,
   DNS,
+  EasyTier,
   Logs,
   Mihomo,
   Override,
@@ -55,6 +56,10 @@ const routes = [
   {
     path: '/resources',
     element: startupRoute(<Resources />)
+  },
+  {
+    path: '/easytier',
+    element: startupRoute(<EasyTier />)
   },
   {
     path: '/dns',

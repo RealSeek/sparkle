@@ -141,6 +141,75 @@ export const mihomoProxies = async (): Promise<ControllerProxies> => {
   return await instance.get('/proxies')
 }
 
+export const mihomoEasyTierGateways = async (): Promise<EasyTierGateway[]> => {
+  const [proxies, providers, instance] = await Promise.all([
+    mihomoProxies(),
+    mihomoProxyProviders(),
+    getAxios()
+  ])
+  const gateways: { name: string; provider?: string }[] = Object.values(proxies.proxies)
+    .filter((proxy) => proxy.type === 'EasyTier')
+    .map((proxy) => ({ name: proxy.name }))
+  Object.entries(providers.providers).forEach(([provider, detail]) => {
+    detail.proxies?.forEach((proxy) => {
+      if (proxy.type === 'EasyTier' && !gateways.some((gateway) => gateway.name === proxy.name)) {
+        gateways.push({ name: proxy.name, provider })
+      }
+    })
+  })
+  return Promise.all(
+    gateways.map(async (gateway): Promise<EasyTierGateway> => {
+      const name = encodeURIComponent(gateway.name)
+      const path = `/easytier/${name}`
+      try {
+        const data = await instance.get<EasyTierControllerStatus, EasyTierControllerStatus>(path, {
+          timeout: 5000
+        })
+        const direct = new Set(
+          data.peers
+            .filter((peer) => peer.connections.some((connection) => !connection.closed))
+            .map((peer) => peer['peer-id'])
+        )
+        const nodes: EasyTierDevice[] = []
+        if (data.node) {
+          nodes.push({
+            peerId: data.node['peer-id'],
+            hostname: data.node.hostname,
+            ipv4: data.node.ipv4,
+            connection: 'local',
+            udpNat: data.node['udp-nat'] ?? 'Unknown',
+            tcpNat: data.node['tcp-nat'] ?? 'Unknown',
+            publicIPs: data.node['public-ips'] ?? null
+          })
+        }
+        for (const route of data.routes) {
+          if (route['peer-id'] === data.node?.['peer-id']) continue
+          const nextHop = route['next-hop-peer-id-latency-first'] ?? route['next-hop-peer-id']
+          nodes.push({
+            peerId: route['peer-id'],
+            hostname: route.hostname,
+            ipv4: route.ipv4,
+            connection: direct.has(nextHop)
+              ? nextHop === route['peer-id']
+                ? 'p2p'
+                : 'relay'
+              : 'disconnected',
+            nextHopPeerId: nextHop,
+            udpNat: route['udp-nat'] ?? 'Unknown',
+            tcpNat: route['tcp-nat'] ?? 'Unknown',
+            publicIPs: route['public-ips'] ?? null
+          })
+        }
+        return { ...gateway, status: { state: data.state, nodes } }
+      } catch (error) {
+        const message =
+          error && typeof error === 'object' && 'message' in error ? error.message : error
+        return { ...gateway, error: `${path}: ${String(message)}` }
+      }
+    })
+  )
+}
+
 function isControllerGroupDetail(
   proxy: ControllerProxiesDetail | ControllerGroupDetail | undefined
 ): proxy is ControllerGroupDetail {

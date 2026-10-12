@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import {
   closestCenter,
   DndContext,
@@ -19,6 +19,7 @@ import OverrideCard from './override-card'
 import ProfileCard from './profile-card'
 import ProxyCard from './proxy-card'
 import ResourceCard from './resource-card'
+import EasyTierCard from './easytier-card'
 import RuleCard from './rule-card'
 import SniffCard from './sniff-card'
 import SubStoreCard from './substore-card'
@@ -52,6 +53,7 @@ const defaultSiderOrder = [
   'mihomo',
   'rule',
   'resource',
+  'easytier',
   'override',
   'log',
   'substore'
@@ -69,6 +71,7 @@ const siderCardRouteMap = {
   'log-card': '/logs',
   'rule-card': '/rules',
   'resource-card': '/resources',
+  'easytier-card': '/easytier',
   'override-card': '/override',
   'substore-card': '/substore'
 } as const
@@ -89,6 +92,7 @@ const componentMap = {
   log: LogCard,
   rule: RuleCard,
   resource: ResourceCard,
+  easytier: EasyTierCard,
   override: OverrideCard,
   substore: SubStoreCard
 }
@@ -103,7 +107,14 @@ export default function SiderCards({
   expanded = false
 }: Props): React.JSX.Element {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const siderOrder = appConfig?.siderOrder ?? defaultSiderOrder
+  const savedOrder = appConfig?.siderOrder ?? defaultSiderOrder
+  const siderOrder = useMemo(() => {
+    if (savedOrder.includes('easytier')) return savedOrder
+    const nextOrder = savedOrder.slice()
+    const resourceIndex = nextOrder.indexOf('resource')
+    nextOrder.splice(resourceIndex < 0 ? nextOrder.length : resourceIndex + 1, 0, 'easytier')
+    return nextOrder
+  }, [savedOrder])
   const [order, setOrder] = useState(siderOrder)
   const gridRef = useRef<HTMLDivElement>(null)
   const suppressClickRef = useRef(false)

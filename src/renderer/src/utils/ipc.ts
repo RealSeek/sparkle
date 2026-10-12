@@ -33,6 +33,10 @@ export async function mihomoProxies(): Promise<ControllerProxies> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoProxies'))
 }
 
+export async function mihomoEasyTierGateways(): Promise<EasyTierGateway[]> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoEasyTierGateways'))
+}
+
 export async function mihomoGroups(): Promise<ControllerMixedGroup[]> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoGroups'))
 }

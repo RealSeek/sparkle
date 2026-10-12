@@ -13,6 +13,7 @@ const MihomoPage = createPreloadablePage(() => import('@renderer/pages/mihomo'))
 const SysproxyPage = createPreloadablePage(() => import('@renderer/pages/syspeoxy'))
 const TunPage = createPreloadablePage(() => import('@renderer/pages/tun'))
 const ResourcesPage = createPreloadablePage(() => import('@renderer/pages/resources'))
+const EasyTierPage = createPreloadablePage(() => import('@renderer/pages/easytier'))
 const DNSPage = createPreloadablePage(() => import('@renderer/pages/dns'))
 const SnifferPage = createPreloadablePage(() => import('@renderer/pages/sniffer'))
 const SubStorePage = createPreloadablePage(() => import('@renderer/pages/substore'))
@@ -28,6 +29,7 @@ export const Mihomo = MihomoPage.Page
 export const Sysproxy = SysproxyPage.Page
 export const Tun = TunPage.Page
 export const Resources = ResourcesPage.Page
+export const EasyTier = EasyTierPage.Page
 export const DNS = DNSPage.Page
 export const Sniffer = SnifferPage.Page
 export const SubStore = SubStorePage.Page
@@ -45,6 +47,7 @@ const remainingPageLoaders: Array<() => Promise<unknown>> = [
   DNSPage.preload,
   SnifferPage.preload,
   ResourcesPage.preload,
+  EasyTierPage.preload,
   OverridePage.preload,
   LogsPage.preload,
   SubStorePage.preload

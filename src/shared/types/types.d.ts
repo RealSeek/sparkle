@@ -38,6 +38,7 @@ type MihomoProxyType =
   | 'Hysteria'
   | 'Hysteria2'
   | 'WireGuard'
+  | 'EasyTier'
   | 'Tuic'
   | 'Ssh'
   | 'Mieru'

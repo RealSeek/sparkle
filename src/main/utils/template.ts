@@ -48,6 +48,7 @@ export const defaultConfig: AppConfig = {
     'mihomo',
     'rule',
     'resource',
+    'easytier',
     'override',
     'log',
     'substore'

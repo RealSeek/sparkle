@@ -74,6 +74,7 @@ interface AppConfig {
   profileCardStatus?: CardStatus
   proxyCardStatus?: CardStatus
   resourceCardStatus?: CardStatus
+  easytierCardStatus?: CardStatus
   ruleCardStatus?: CardStatus
   sniffCardStatus?: CardStatus
   substoreCardStatus?: CardStatus
